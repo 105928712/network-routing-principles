@@ -1,0 +1,113 @@
+
+!
+version 15.4
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname ISP_R3
+!
+!
+!
+!
+!
+!
+!
+!
+no ip cef
+no ipv6 cef
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description EXT WEB 1
+ ip address 154.3.0.1 255.255.0.0
+!
+interface Loopback1
+ description EXT WEB 2
+ ip address 18.0.0.1 255.0.0.0
+!
+interface Loopback2
+ description EXT WEB 3
+ ip address 162.55.0.1 255.255.0.0
+!
+interface Loopback3
+ description EXT WEB 4
+ ip address 201.12.80.1 255.255.255.0
+!
+interface GigabitEthernet0/0/0
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+!
+interface GigabitEthernet0/0/1
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+!
+interface Serial0/1/0
+ no ip address
+ clock rate 2000000
+ shutdown
+!
+interface Serial0/1/1
+ description Connection to Corporate Network
+ ip address 201.24.41.2 255.255.255.252
+ encapsulation ppp
+ clock rate 2000000
+!
+interface Serial0/2/0
+ no ip address
+ clock rate 2000000
+ shutdown
+!
+interface Serial0/2/1
+ no ip address
+ clock rate 2000000
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+ip classless
+ip route 135.12.64.0 255.255.255.128 201.24.41.1 
+!
+ip flow-export version 9
+!
+!
+!
+banner motd ^C Joey Manani Tuesday 8:30 ^C
+!
+!
+!
+!
+line con 0
+ logging synchronous
+!
+line aux 0
+!
+line vty 0 4
+ login
+!
+!
+!
+end

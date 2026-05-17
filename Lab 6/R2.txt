@@ -1,0 +1,143 @@
+
+!
+version 15.4
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname Daspur_R2
+!
+!
+!
+!
+ip dhcp excluded-address 158.72.0.1 158.72.0.4
+ip dhcp excluded-address 158.72.4.1 158.72.4.4
+!
+ip dhcp pool VLANXXXDHCP
+ network 158.72.0.0 255.255.252.0
+ default-router 158.72.0.1
+ip dhcp pool VLANYYYPOOL
+ network 158.72.4.0 255.255.255.0
+ default-router 158.72.4.1
+!
+!
+!
+no ip cef
+no ipv6 cef
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Connection to Database Server LAN
+ ip address 158.72.5.129 255.255.255.224
+!
+interface GigabitEthernet0/0/0
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+!
+interface GigabitEthernet0/0/1
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+!
+interface Serial0/1/0
+ description Connection to Nagri
+ bandwidth 256
+ ip address 158.72.5.170 255.255.255.252
+ ip nat inside
+ clock rate 2000000
+!
+interface Serial0/1/1
+ description Connection to ISP
+ ip address 201.24.41.1 255.255.255.252
+ encapsulation ppp
+ ip nat outside
+!
+interface Serial0/2/0
+ no ip address
+ clock rate 2000000
+ shutdown
+!
+interface Serial0/2/1
+ no ip address
+ clock rate 2000000
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router ospf 1
+ log-adjacency-changes
+ passive-interface default
+ no passive-interface Serial0/1/0
+ no passive-interface Loopback0
+ network 158.72.5.168 0.0.0.3 area 0
+ network 158.72.5.128 0.0.0.31 area 0
+ default-information originate
+!
+ip nat pool VLAN1NAT 135.12.64.0 135.12.64.31 netmask 255.255.255.224
+ip nat pool VLAN712NAT 135.12.64.32 135.12.64.63 netmask 255.255.255.224
+ip nat pool VLAN928NAT 135.12.64.64 135.12.64.95 netmask 255.255.255.224
+ip nat inside source list VLAN1LIST pool VLAN1NAT overload
+ip nat inside source list VLAN712LIST pool VLAN712NAT overload
+ip nat inside source list VLAN928LIST pool VLAN928NAT overload
+ip classless
+ip route 0.0.0.0 0.0.0.0 201.24.41.2 
+!
+ip flow-export version 9
+!
+!
+ip access-list standard VLAN1LIST
+ permit 158.72.5.160 0.0.0.7
+ip access-list standard VLAN712LIST
+ permit 158.72.0.0 0.0.3.255
+ip access-list standard VLAN928LIST
+ permit 158.72.4.0 0.0.0.255
+ip access-list standard TELNETACL
+ deny 158.72.0.0 0.0.3.255
+ permit any
+!
+banner motd ^C Joey Manani 8:30 Tuesday ^C
+!
+!
+!
+!
+line con 0
+ logging synchronous
+!
+line aux 0
+!
+line vty 0 4
+ access-class TELNETACL in
+ password cisco
+ login
+ transport input telnet
+line vty 5 15
+ access-class TELNETACL in
+ password cisco
+ login
+ transport input telnet
+!
+!
+!
+end

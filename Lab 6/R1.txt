@@ -1,0 +1,143 @@
+
+!
+version 15.4
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname Nagri_R1
+!
+!
+!
+!
+!
+!
+!
+!
+no ip cef
+no ipv6 cef
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet0/0/0
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+!
+interface GigabitEthernet0/0/1
+ no ip address
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/0/1.1
+ encapsulation dot1Q 1 native
+ ip address 158.72.5.161 255.255.255.248
+!
+interface GigabitEthernet0/0/1.256
+ encapsulation dot1Q 256
+ ip address 158.72.5.1 255.255.255.128
+!
+interface GigabitEthernet0/0/1.712
+ encapsulation dot1Q 712
+ ip address 158.72.0.1 255.255.252.0
+ ip helper-address 158.72.5.170
+ ip access-group VLAN712ACL in
+!
+interface GigabitEthernet0/0/1.928
+ encapsulation dot1Q 928
+ ip address 158.72.4.1 255.255.255.0
+ ip helper-address 158.72.5.170
+ ip access-group VLAN928ACL in
+!
+interface Serial0/1/0
+ description Connection to Daspur_R2
+ bandwidth 256
+ ip address 158.72.5.169 255.255.255.252
+!
+interface Serial0/1/1
+ no ip address
+ clock rate 2000000
+ shutdown
+!
+interface Serial0/2/0
+ no ip address
+ clock rate 2000000
+ shutdown
+!
+interface Serial0/2/1
+ no ip address
+ clock rate 2000000
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router ospf 1
+ log-adjacency-changes
+ passive-interface default
+ no passive-interface Serial0/1/0
+ network 158.72.5.168 0.0.0.3 area 0
+ network 158.72.0.0 0.0.3.255 area 0
+ network 158.72.4.0 0.0.0.255 area 0
+ network 158.72.5.0 0.0.0.127 area 0
+ network 158.72.5.160 0.0.0.7 area 0
+!
+ip classless
+!
+ip flow-export version 9
+!
+!
+ip access-list extended VLAN712ACL
+ permit tcp 158.72.0.0 0.0.3.255 154.3.0.0 0.0.255.255 eq www
+ permit icmp 158.72.0.0 0.0.3.255 158.72.4.0 0.0.0.255 echo-reply
+ deny icmp 158.72.0.0 0.0.3.255 158.72.4.0 0.0.0.255 echo
+ deny ip 158.72.0.0 0.0.3.255 154.3.0.0 0.0.255.255
+ permit ip any any
+ip access-list extended VLAN928ACL
+ deny ip 158.72.4.0 0.0.0.255 158.72.5.128 0.0.0.31
+ permit ip any any
+ip access-list standard TELNETACL
+ permit 158.72.0.0 0.0.3.255
+!
+banner motd ^C Joey Manani Tuesday 8:30am ^C
+!
+!
+!
+!
+line con 0
+ logging synchronous
+!
+line aux 0
+!
+line vty 0 4
+ access-class TELNETACL in
+ password cisco
+ login
+ transport input telnet
+line vty 5 15
+ access-class TELNETACL in
+ password cisco
+ login
+ transport input telnet
+!
+!
+!
+end
